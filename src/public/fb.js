@@ -8,6 +8,12 @@ window.fbAsyncInit = () => {
     FB.login(
       (response) => {
         console.log(response)
+        fetch(
+          `/users/auth/facebook?access_token=${response.authResponse.accessToken}`,
+          {
+            method: 'POST',
+          }
+        )
       },
       { scope: 'public_profile,email' }
     )
