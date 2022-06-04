@@ -1,6 +1,10 @@
 /* eslint-disable prefer-destructuring */
 
 const { default: fetch } = require('node-fetch')
+const { v4: uuidv4 } = require('uuid')
+const { getAccessTokenForUserId } = require('./auth')
+const { getUsersCollection } = require('./mongo')
+
 /** @type {string} */
 const FB_APP_ID = process.env.FB_APP_ID
 /** @type {string} */
@@ -12,6 +16,13 @@ const FB_CLIENT_SECRET = process.env.FB_CLIENT_SECRET
  */
 async function createUserWithFacebookIdAndGetId(facebookId) {
   // TOOD: implement it
+  const users = await getUsersCollection()
+  const userId = uuidv4()
+  await users.insertOne({
+    id: userId,
+    facebookId,
+  })
+  return userId
 }
 
 /**
@@ -48,6 +59,15 @@ async function getFacebookIdFromAccessToken(accessToken) {
  */
 async function getUserIdWithFacebookId(facebookId) {
   // TODO: implement it
+  const users = await getUsersCollection()
+  const user = users.findOne({
+    facebookId,
+  })
+
+  if (user) {
+    return user.id
+  }
+  return undefined
 }
 
 /**
@@ -57,7 +77,17 @@ async function getUserIdWithFacebookId(facebookId) {
  */
 async function getUserAccessTokenForFacebookAccessToken(token) {
   // TODO: implement it
-  await getFacebookIdFromAccessToken(token)
+  const facebookId = await getFacebookIdFromAccessToken(token)
+
+  const existingUserId = getUserIdWithFacebookId(facebookId)
+  // 2. 해당 Facebook ID에 해당하는 유저가 데이터베이스에 있는 경우
+  if (existingUserId) {
+    return
+  }
+
+  // 1. 해당 Facebook ID에 해당하는 유저가 데이터베이스에 없는 경우
+  const userId = await createUserWithFacebookIdAndGetId(facebookId)
+  return getAccessTokenForUserId(userId)
 }
 
 module.exports = {
