@@ -60,10 +60,11 @@ async function getFacebookIdFromAccessToken(accessToken) {
 async function getUserIdWithFacebookId(facebookId) {
   // TODO: implement it
   const users = await getUsersCollection()
-  const user = users.findOne({
+  const user = await users.findOne({
     facebookId,
   })
 
+  console.log('from mongo: ', user)
   if (user) {
     return user.id
   }
@@ -78,15 +79,18 @@ async function getUserIdWithFacebookId(facebookId) {
 async function getUserAccessTokenForFacebookAccessToken(token) {
   // TODO: implement it
   const facebookId = await getFacebookIdFromAccessToken(token)
+  console.log('facebookId: ', facebookId)
 
   const existingUserId = await getUserIdWithFacebookId(facebookId)
   // 2. 해당 Facebook ID에 해당하는 유저가 데이터베이스에 있는 경우
   if (existingUserId) {
+    console.log('exist:', existingUserId)
     return getAccessTokenForUserId(existingUserId)
   }
 
   // 1. 해당 Facebook ID에 해당하는 유저가 데이터베이스에 없는 경우
   const userId = await createUserWithFacebookIdAndGetId(facebookId)
+  console.log('create NewId: ', userId)
   return getAccessTokenForUserId(userId)
 }
 
