@@ -79,10 +79,10 @@ async function getUserAccessTokenForFacebookAccessToken(token) {
   // TODO: implement it
   const facebookId = await getFacebookIdFromAccessToken(token)
 
-  const existingUserId = getUserIdWithFacebookId(facebookId)
+  const existingUserId = await getUserIdWithFacebookId(facebookId)
   // 2. 해당 Facebook ID에 해당하는 유저가 데이터베이스에 있는 경우
   if (existingUserId) {
-    return
+    return getAccessTokenForUserId(existingUserId)
   }
 
   // 1. 해당 Facebook ID에 해당하는 유저가 데이터베이스에 없는 경우
