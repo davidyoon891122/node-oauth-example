@@ -92,6 +92,7 @@ async function getUserAccessTokenForFacebookAccessToken(token) {
   const userId = await createUserWithFacebookIdAndGetId(facebookId)
   console.log('create NewId: ', userId)
   console.log('daily fake commit')
+  console.log('daily fake commit 2')
   return getAccessTokenForUserId(userId)
 }
 
