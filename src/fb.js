@@ -91,8 +91,6 @@ async function getUserAccessTokenForFacebookAccessToken(token) {
   // 1. 해당 Facebook ID에 해당하는 유저가 데이터베이스에 없는 경우
   const userId = await createUserWithFacebookIdAndGetId(facebookId)
   console.log('create NewId: ', userId)
-  console.log('daily fake commit')
-  console.log('daily fake commit 2')
   return getAccessTokenForUserId(userId)
 }
 
