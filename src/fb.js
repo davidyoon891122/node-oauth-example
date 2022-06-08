@@ -50,7 +50,15 @@ async function getFacebookIdFromAccessToken(accessToken) {
   if (debugResult.data.app_id !== FB_APP_ID) {
     throw new Error('Not a valid access token')
   }
-  return debugResult.data.user_id
+
+  const userId = debugResult.data.user_id
+
+  const profileRes = await fetch(
+    `https://graph.facebook.com/${userId}?fields=id,name&access_token=${accessToken}`
+  )
+  console.log(await profileRes.json())
+
+  return userId
 }
 
 /**
