@@ -11,6 +11,7 @@ router.get('/', (req, res) => {
     // @ts-ignore
     userId: req.user?.id,
     userName: req.user?.name,
+    userPicture: req.user?.picture?.data?.url,
     APP_CONFIG_JSON: JSON.stringify({
       FB_APP_ID,
     }).replace(/"/g, '\\"'),

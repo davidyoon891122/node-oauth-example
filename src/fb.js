@@ -13,9 +13,14 @@ const FB_CLIENT_SECRET = process.env.FB_CLIENT_SECRET
 /**
  * @param {string} facebookId
  * @param {string} name
+ * @param {string} picture
  * @returns {Promise<string>}
  */
-async function createUserWithFacebookProfileAndGetId(facebookId, name) {
+async function createUserWithFacebookProfileAndGetId({
+  id: facebookId,
+  name,
+  picture,
+}) {
   // TOOD: implement it
   const users = await getUsersCollection()
   const userId = uuidv4()
@@ -23,6 +28,7 @@ async function createUserWithFacebookProfileAndGetId(facebookId, name) {
     id: userId,
     facebookId,
     name,
+    picture,
   })
   return userId
 }
@@ -56,14 +62,9 @@ async function getFacebookProfileFromAccessToken(accessToken) {
   const facebookId = debugResult.data.user_id
 
   const profileRes = await fetch(
-    `https://graph.facebook.com/${facebookId}?fields=id,name&access_token=${accessToken}`
+    `https://graph.facebook.com/${facebookId}?fields=id,name,picture&access_token=${accessToken}`
   )
-  const facebookProfile = await profileRes.json()
-
-  return {
-    facebookId,
-    name: facebookProfile.name,
-  }
+  return profileRes.json()
 }
 
 /**
@@ -91,8 +92,9 @@ async function getUserIdWithFacebookId(facebookId) {
  */
 async function getUserAccessTokenForFacebookAccessToken(token) {
   // TODO: implement it
-  const { facebookId, name } = await getFacebookProfileFromAccessToken(token)
-  console.log('facebookId: ', facebookId)
+  const fbProfile = await getFacebookProfileFromAccessToken(token)
+
+  const { id: facebookId } = fbProfile
 
   const existingUserId = await getUserIdWithFacebookId(facebookId)
   // 2. 해당 Facebook ID에 해당하는 유저가 데이터베이스에 있는 경우
@@ -102,7 +104,7 @@ async function getUserAccessTokenForFacebookAccessToken(token) {
   }
 
   // 1. 해당 Facebook ID에 해당하는 유저가 데이터베이스에 없는 경우
-  const userId = await createUserWithFacebookProfileAndGetId(facebookId, name)
+  const userId = await createUserWithFacebookProfileAndGetId(fbProfile)
   console.log('create NewId: ', userId)
   return getAccessTokenForUserId(userId)
 }
