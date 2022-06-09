@@ -31,7 +31,10 @@ app.use(async (req, res, next) => {
 
         if (user) {
           // @ts-ignore
-          req.userId = user.id
+          req.user = {
+            id: user.id,
+            name: user.name,
+          }
         }
       }
     } catch (e) {
